@@ -4,7 +4,10 @@ const {
     Envelope,
     addEnvelope,
     getAllEnvelopes,
-    getEnvelopeById
+    getEnvelopeById,
+    updateEnvelopeById,
+    deleteEnvelopeById,
+    transferBudget
 } = require('./db');
 
 module.exports = envelopesRouter;
@@ -37,5 +40,30 @@ envelopesRouter.get('/:envelopeId', (req, res, next) => {
 });
 
 envelopesRouter.put('/:envelopeId', (req, res, next) => {
-    
+    try {
+        const updatedEnvelope = updateEnvelopeById(req.params.envelopeId, req.body.envelopeName, req.body.budget);
+        res.status(202).send(updatedEnvelope);
+    } catch (err) {
+        next(err);
+    }
 });
+
+envelopesRouter.delete('/:envelopeId', (req, res, next) => {
+    const id = req.params.envelopeId;
+    try {
+        const deletedEnvelope = deleteEnvelopeById(id);
+        res.status(202).send(deletedEnvelope);
+    } catch (err) {
+        next(err);
+    }
+});
+
+// envelopesRouter.put('/:fromId/:toId', (req, res, next) => {
+//     const fromId = Number(req.params.fromId);
+//     const toId = Number(req.params.toId);
+//     const amount = Number(req.query.amount);
+//     if (amount > 0) {
+//         transferBudget(req.params.fromId, req.params.toId, req.query.amount);
+//         res.send();
+//     }
+// });

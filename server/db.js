@@ -20,6 +20,7 @@ const addEnvelope = envelopeObject => {
 // Return all envelopes
 const getAllEnvelopes = () => envelopes;
 
+// Return envelope based on id
 const getEnvelopeById = id => {
     for (let envelope of envelopes) {
         if (envelope.id === Number(id)) {
@@ -29,13 +30,50 @@ const getEnvelopeById = id => {
     return null;
 }
 
-const updateEnvelopeById = (id, title, budget) => {
-    
-};
+const updateEnvelopeById = (id, envelopeName = null, budget = null) => {
+    for (let envelope of envelopes) {
+        if (envelope.id === Number(id)) {
+            if (envelopeName !== null){
+                envelope.envelopeName = envelopeName;
+            }
+            if (budget !== null) {
+                envelope.budget = budget;
+            }
+            return envelope;
+        }
+    }
+    return null;
+}
+
+const deleteEnvelopeById = id => {
+    let foundIndex; 
+    for (let i = 0; i < envelopes.length; i++) {
+        if (envelopes[i].id === Number(id)) {
+            foundIndex = i;
+        }
+    }
+    if (foundIndex) {
+        const deletedEnvelope = envelopes[foundIndex];
+        envelopes.splice(foundIndex, 1);
+        return deletedEnvelope;
+    } else {
+        return null;
+    }
+}
+
+// const transferBudget = (fromId, toId, amount) => {
+//     if (envelopes[fromId].budget >= amount) {
+//         envelopes[fromId].budget -= amount;
+//         envelopes[toId].budget += amount;
+//     }
+// }
 
 module.exports = {
     Envelope,
     addEnvelope,
     getAllEnvelopes,
-    getEnvelopeById
+    getEnvelopeById,
+    updateEnvelopeById,
+    deleteEnvelopeById,
+    transferBudget
 };
