@@ -20,54 +20,67 @@ const addEnvelope = envelopeObject => {
 // Return all envelopes
 const getAllEnvelopes = () => envelopes;
 
-// Return envelope based on id
-const getEnvelopeById = id => {
-    for (let envelope of envelopes) {
-        if (envelope.id === Number(id)) {
-            return envelope;
-        }
-    }
-    return null;
-}
-
-const updateEnvelopeById = (id, envelopeName = null, budget = null) => {
-    for (let envelope of envelopes) {
-        if (envelope.id === Number(id)) {
-            if (envelopeName !== null){
-                envelope.envelopeName = envelopeName;
-            }
-            if (budget !== null) {
-                envelope.budget = budget;
-            }
-            return envelope;
-        }
-    }
-    return null;
-}
-
-const deleteEnvelopeById = id => {
-    let foundIndex; 
+const findEnvelopeArrayIndex = id => {
+    let foundIndex = -1;
     for (let i = 0; i < envelopes.length; i++) {
         if (envelopes[i].id === Number(id)) {
             foundIndex = i;
         }
     }
-    if (foundIndex) {
-        const deletedEnvelope = envelopes[foundIndex];
-        envelopes.splice(foundIndex, 1);
+    return foundIndex;
+}
+
+// Return envelope based on id
+const getEnvelopeById = id => {
+    const envelopeIndex = findEnvelopeArrayIndex(id);
+    if (envelopeIndex !== -1) {
+        return envelopes[envelopeIndex];
+    } else {
+        return null;
+    }
+}
+
+// Update envelope based on id
+const updateEnvelopeById = (id, envelopeName = null, budget = null) => {
+    const envelopeIndex = findEnvelopeArrayIndex(id);
+    if (envelopeIndex !== -1) {
+        if (envelopeName !== null) {
+            envelopes[envelopeIndex].envelopeName = envelopeName;
+        }
+        if (budget !== null) {
+            envelopes[envelopeIndex].budget = budget;
+        }
+        return envelopes[envelopeIndex];
+    } else {
+        return null;
+    }
+}
+
+// Delete envelope based on id
+const deleteEnvelopeById = id => {
+    const envelopeIndex = findEnvelopeArrayIndex(id);
+    if (envelopeIndex !== -1) {
+        const deletedEnvelope = envelopes[envelopeIndex];
+        envelopes.splice(envelopeIndex, 1);
         return deletedEnvelope;
     } else {
         return null;
     }
 }
 
-// const transferBudget = (fromId, toId, amount) => {
-//     if (envelopes[fromId].budget >= amount) {
-//         envelopes[fromId].budget -= amount;
-//         envelopes[toId].budget += amount;
-//     }
-// }
+// Transfer budget from one envelope to another
+const transferBudget = (fromId, toId, amount) => {
+    const fromIndex = findEnvelopeArrayIndex(fromId);
+    const toIndex = findEnvelopeArrayIndex(toId);
+    amount = Number(amount);
 
+    if (envelopes[fromIndex].budget >= amount) {
+        envelopes[fromIndex].budget -= amount;
+        envelopes[toIndex].budget += amount;
+    }
+}
+
+// Export utility functions
 module.exports = {
     Envelope,
     addEnvelope,

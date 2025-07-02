@@ -1,7 +1,8 @@
+// Import Express and create envelope router
 const envelopesRouter = require('express').Router();
 
+// Import utility functions from db.js
 const {
-    Envelope,
     addEnvelope,
     getAllEnvelopes,
     getEnvelopeById,
@@ -12,6 +13,7 @@ const {
 
 module.exports = envelopesRouter;
 
+// Will run whenever /:envelopeId is a parameter to attach the correct envelope to req
 envelopesRouter.param('envelopeId', (req, res, next, id) => {
     const envelope = getEnvelopeById(id);
     if (envelope) {
@@ -22,10 +24,12 @@ envelopesRouter.param('envelopeId', (req, res, next, id) => {
     }
 });
 
+// GET all envelopes
 envelopesRouter.get('/', (req, res, next) => {
     res.send(getAllEnvelopes());
 });
 
+// POST new envelope
 envelopesRouter.post('/', (req, res, next) => {
     try {
         const newEnvelope = addEnvelope(req.body);
@@ -35,10 +39,12 @@ envelopesRouter.post('/', (req, res, next) => {
     }
 });
 
+// GET envelope by ID
 envelopesRouter.get('/:envelopeId', (req, res, next) => {
     res.send(req.envelope);
 });
 
+// PUT new data into existing envelope
 envelopesRouter.put('/:envelopeId', (req, res, next) => {
     try {
         const updatedEnvelope = updateEnvelopeById(req.params.envelopeId, req.body.envelopeName, req.body.budget);
@@ -48,6 +54,7 @@ envelopesRouter.put('/:envelopeId', (req, res, next) => {
     }
 });
 
+// DELETE envelope
 envelopesRouter.delete('/:envelopeId', (req, res, next) => {
     const id = req.params.envelopeId;
     try {
@@ -58,12 +65,10 @@ envelopesRouter.delete('/:envelopeId', (req, res, next) => {
     }
 });
 
-// envelopesRouter.put('/:fromId/:toId', (req, res, next) => {
-//     const fromId = Number(req.params.fromId);
-//     const toId = Number(req.params.toId);
-//     const amount = Number(req.query.amount);
-//     if (amount > 0) {
-//         transferBudget(req.params.fromId, req.params.toId, req.query.amount);
-//         res.send();
-//     }
-// });
+// PUT (transfer) budget from one envelope to another
+envelopesRouter.put('/:fromId/:toId', (req, res, next) => {
+    if (Number(req.query.amount) > 0) {
+        transferBudget(req.params.fromId, req.params.toId, req.query.amount);
+        res.send();
+    }
+});
