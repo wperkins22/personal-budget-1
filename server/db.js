@@ -11,9 +11,18 @@ const Envelope = (id, envelopeName, budget) => {
 let envelopes = [];
 let totalBudget = 0;
 
+const calculateTotalBudget = () => {
+    totalBudget = 0;
+    for (let envelope of envelopes) {
+        totalBudget += envelope.budget;
+    }
+    return totalBudget;
+}
+
 // Add new envelope to envelopes array
 const addEnvelope = envelopeObject => {
     envelopes.push(Envelope(envelopeObject.id, envelopeObject.envelopeName, envelopeObject.budget));
+    calculateTotalBudget();
     return envelopeObject;
 }
 
@@ -27,6 +36,11 @@ const findEnvelopeArrayIndex = id => {
             foundIndex = i;
         }
     }
+    if (foundIndex === -1) {
+        const err = new Error(`Envelope with ID ${id} not found.`);
+        err.status = 404;
+        throw err;
+    } 
     return foundIndex;
 }
 
