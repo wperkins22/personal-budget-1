@@ -1,3 +1,13 @@
+// Import Pool for SQL queries
+const Pool = require('pg').Pool;
+const pool = new Pool({
+    user: 'db_user',
+    host: 'localhost',
+    database: 'personal_budget',
+    password: 'password',
+    port: 5432
+});
+
 // Function creates envelope objects
 const Envelope = (id, envelopeName, budget) => {
     return {
@@ -96,6 +106,7 @@ const transferBudget = (fromId, toId, amount) => {
 
 // Export utility functions
 module.exports = {
+    pool,
     Envelope,
     addEnvelope,
     getAllEnvelopes,

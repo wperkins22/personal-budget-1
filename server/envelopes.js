@@ -1,15 +1,7 @@
+const { pool } = require('./db');
+
 // Import Express and create envelope router
 const envelopesRouter = require('express').Router();
-
-// Import Pool for SQL queries
-const Pool = require('pg').Pool;
-const pool = new Pool({
-    user: 'db_user',
-    host: 'localhost',
-    database: 'personal_budget',
-    password: 'password',
-    port: 5432
-});
 
 module.exports = envelopesRouter;
 
