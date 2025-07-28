@@ -39,7 +39,11 @@ envelopesRouter.get('/:envelopeId', (req, res, next) => {
         if (error) {
             next(error);
         }
-        res.status(200).json(results.rows);
+        if (results.rows !== '[]') {
+            res.status(200).json(results.rows);
+        } else {
+            res.status(404).send(`Envelope with ID: ${id} not found`);
+        }
     });
 });
 
@@ -79,33 +83,43 @@ envelopesRouter.delete('/:envelopeId', (req, res, next) => {
 });
 
 // PUT (transfer) budget from one envelope to another
-envelopesRouter.put('/:fromId/:toId', (req, res, next) => {
+envelopesRouter.put('/:fromId/:toId', async (req, res, next) => {
     const from_id = parseInt(req.params.fromId);
     const to_id = parseInt(req.params.toId);
     const amount = parseFloat(req.query.amount);
 
-    // Only want to perform transfer if amount is greater than 0
-    if (amount > 0) {
-        // Query to subtract budget from sender envelope
-        pool.query(
-            'UPDATE envelope SET budget = budget - $1 WHERE id = $2',
-            [amount, from_id],
-            (error, results) => {
-                if (error) {
-                    next(error);
-                }
-                // Query to add budget to recipient envelope
-                pool.query(
-                    'UPDATE envelope SET budget = budget + $1 WHERE id = $2',
-                    [amount, to_id],
-                    (error, results) => {
-                        if (error) {
-                            next(error);
-                        }
-                        res.status(200).send(`Transferred \$${amount} from envelope with ID ${from_id} to envelope with ID ${to_id}`);
+    // Query will return null row even if id is not found in database, need to check beforehand
+    const test_from_id = (await pool.query('SELECT * FROM envelope WHERE id = $1', [from_id])).rows[0];
+    const test_to_id = (await pool.query('SELECT * FROM envelope WHERE id = $1', [to_id])).rows[0];
+
+    if (!test_from_id) {
+        res.status(404).send(`Envelope with ID: ${from_id} not found`);
+    } else if (!test_to_id) {
+        res.status(404).send(`Envelope with ID: ${to_id} not found`);
+    } else {
+        // Only want to perform transfer if amount is greater than 0
+        if (amount > 0) {
+            // Query to subtract budget from sender envelope
+            pool.query(
+                'UPDATE envelope SET budget = budget - $1 WHERE id = $2',
+                [amount, from_id],
+                (error, results) => {
+                    if (error) {
+                        next(error);
                     }
-                );
-            }
-        );
+                    // Query to add budget to recipient envelope
+                    pool.query(
+                        'UPDATE envelope SET budget = budget + $1 WHERE id = $2',
+                        [amount, to_id],
+                        (error, results) => {
+                            if (error) {
+                                next(error);
+                            }
+                            res.status(200).send(`Transferred \$${amount} from envelope with ID ${from_id} to envelope with ID ${to_id}`);
+                        }
+                    );
+                }
+            );
+        }
     }
 });
