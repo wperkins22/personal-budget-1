@@ -8,9 +8,10 @@ Project allows users to create budgeting envelopes, update them, delete them, an
 
 ## How to Use
 1. Download code from GitHub
-2. Navigate to directory that the project was downloaded to using Command Line Interface and run "npm install" to install dependencies. Dependencies needed are morgan, cors, and body-parser
-3. To run the program, execute "node server.js" from the Command Line Interface
-4. Currently, you must use an API platform to interact with the program. Postman is recommended. Use the URL http://localhost3000/api/envelopes. Some example operations are:
+2. Navigate to directory that the project was downloaded to using Command Line Interface and run "npm install" to install dependencies. Dependencies needed are express, morgan, cors, body-parser and pg
+3. To create the necessary database, connect to psql using Command Line Interface and follow the instructions in the comments of the database.sql file
+4. To run the program, execute "node server.js" from the Command Line Interface
+5. Currently, you must use an API platform to interact with the program. Postman is recommended. Use the URL http://localhost3000/api/envelopes. Some example operations are:
     * POST http://localhost3000/api/envelopes to create a new envelope (must add information to body in format: {"id":*id*, "envelopeName": *envelopeName*, "budget": *budget*})
     * GET http://localhost3000/api/envelopes to get all envelopes
     * GET http://localhost3000/api/envelopes/:envelopeId to get an envelope by ID

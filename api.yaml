@@ -1,0 +1,374 @@
+openapi: 3.0.1
+info:
+  title: Personal Budget API
+  version: 1.0.0
+  description: An api for interacting with the database in my personal budget project
+paths:
+  /:
+    summary: Display "Hello, World"
+    description: >-
+      Displays "Hello, World" if the server is running and user navigates to
+      http://localhost:3000 in a browser
+  /api/envelopes:
+    summary: Get orders data
+    description: This path is used to retrieve all of the envelope data from the database
+    get:
+      summary: Gets the envelope data
+      description: Retrieve all envelope data from the database
+      operationId: get_envelopes
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                All envelopes:
+                  value: >-
+                    [ { "id": 1, "name": "test budget 1", "budget": 1000 }, {
+                    "id": 2, "name": "test budget 2", "budget": 750 }, { "id":
+                    3, "name": "test budget 3", "budget": 1500 }]
+          description: Success
+      tags:
+        - Get Envelopes
+    post:
+      summary: Adds a new envelope
+      description: Add a new envelope to the database
+      operationId: new_envelope
+      requestBody:
+        description: The envelope's name and budget
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The envelope's name
+                budget:
+                  type: number
+                  description: The envelope's budget
+      responses:
+        '201':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                New envelope:
+                  value: 'Expected "New budget added with ID: 1"'
+          description: Created
+        '500':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Internal Service Error:
+                  value: >-
+                    null value in column "budget" of relation "envelope"
+                    violates not-null constraint
+          description: Internal Service Error
+      tags:
+        - New Envelope
+  /api/envelopes/{envelopeId}:
+    summary: Select envelopes by ID
+    description: This path deals with operating on specific envelopes by ID
+    parameters:
+      - name: envelopeId
+        in: path
+        description: The ID of the envelope
+        required: true
+        schema:
+          type: string
+    get:
+      summary: 'Select an envelope '
+      description: Select a single envelope by envelope ID
+      operationId: get_envelope
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Envelope:
+                  value: |-
+                    [
+                        {
+                            "id": 1,
+                            "name": "test budget 1",
+                            "budget": 1000
+                        }
+                    ]
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Not Found:
+                  value: 'Envelope with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Get Envelopes
+    put:
+      summary: Update existing envelope
+      description: Update an existing envelope by ID with new data
+      operationId: update_envelope
+      requestBody:
+        description: The envelope's name and budget
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The envelope's name
+                budget:
+                  type: number
+                  description: The envelope's budget
+      responses:
+        '200':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Envelope Modified:
+                  value: 'Budget modified with ID: 1'
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Not Found:
+                  value: 'Envelope with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Update Envelope
+    delete:
+      summary: Delete an envelope
+      description: Delete an envelope from the database by ID
+      operationId: delete_envelope
+      responses:
+        '200':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Envelope Deleted:
+                  value: 'Envelope deleted with ID: 1'
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Not Found:
+                  value: 'Envelope with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Delete Envelope
+  /api/envelopes/{fromId}/{toId}:
+    summary: Transfer between envelopes
+    description: This path deals with transferring budget between envelopes
+    put:
+      summary: Transfer budget
+      description: Transfer budget from one envelope to another
+      operationId: transfer_budget
+      parameters:
+        - name: fromId
+          in: path
+          description: The ID of the sender envelope
+          required: true
+          schema:
+            type: string
+        - name: toId
+          in: path
+          description: The ID of the recipient envelope
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          description: The amount of money to send between envelopes
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Budget Transferred:
+                  value: >-
+                    Transferred $50000 from envelope with ID 1 to envelope with
+                    ID 2
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Not Found:
+                  value: 'Envelope with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Transfer Budget
+  /api/transactions:
+    summary: Get transaction data
+    description: This path deals with getting transaction data from the database
+    get:
+      summary: Get all transactions
+      description: Get all transactions data from the database
+      operationId: get_transactions
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Transactions:
+                  value: |-
+                    [
+                        {
+                            "id": 1,
+                            "date": "2025-07-27T06:00:00.000Z",
+                            "amount": 500,
+                            "recipient": "Ferrari",
+                            "envelope_id": 1
+                        },
+                        {
+                            "id": 2,
+                            "date": "2025-07-27T06:00:00.000Z",
+                            "amount": 1000,
+                            "recipient": "School",
+                            "envelope_id": 2
+                        }
+                    ]
+          description: Success
+      tags:
+        - Get Transactions
+    post:
+      summary: Add new transaction
+      description: Add a new transaction to the database
+      operationId: add_transaction
+      requestBody:
+        description: The transaction's date, amount, recipient, and envelope ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The transaction date
+                amount:
+                  type: number
+                  description: The amount of money spent in the transaction
+                recipient:
+                  type: string
+                  description: The recipient of the money spent in the transaction
+                envelope_id:
+                  type: number
+                  description: The ID of the envelope used for the transaction
+      responses:
+        '201':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                New Transaction:
+                  value: 'New transaction added with ID: 1'
+          description: Created
+      tags:
+        - New Transaction
+  /api/transactions/{transactionId}:
+    summary: Transactions based on ID
+    description: This path deals with transactions based on transaction ID
+    parameters:
+      - name: transactionId
+        in: path
+        description: The ID of the transaction
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get transaction
+      description: Get a transaction from the database by ID
+      operationId: get_transaction
+      responses:
+        '200':
+          content:
+            application/json:
+              examples:
+                Transaction:
+                  value: |-
+                    [
+                        {
+                            "id": 1,
+                            "date": "2025-07-27T06:00:00.000Z",
+                            "amount": 500,
+                            "recipient": "Ferrari",
+                            "envelope_id": 1
+                        }
+                    ]
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Not Found:
+                  value: 'Transaction with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Get Transactions
+    put:
+      summary: Update transaction
+      description: Updata a transaction's data by ID
+      operationId: update_transaction
+      requestBody:
+        description: The transaction's date, amount, recipient, and envelope ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The transaction date
+                amount:
+                  type: number
+                  description: The amount of money spent in the transaction
+                recipient:
+                  type: string
+                  description: The recipient of the money spent in the transaction
+                envelope_id:
+                  type: number
+                  description: The ID of the envelope used for the transaction
+      responses:
+        '200':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Updated Transaction:
+                  value: 'Transaction modified with ID: 2'
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Not Found:
+                  value: 'Transaction with ID: -1 not found'
+          description: Not Found
+      tags:
+        - Update Transaction
+    delete:
+      summary: Delete transaction
+      description: Delete a transaction from the database
+      operationId: delete_transaction
+      responses:
+        '200':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Transaction Deleted:
+                  value: 'Transaction deleted with ID: 2'
+          description: Success
+        '404':
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                Not Found:
+                  value: 'Transaction with ID: -1 not found'
+          description: Not Found
+        default:
+          description: Default error sample response
+      tags:
+        - Delete Transaction
